@@ -6,7 +6,21 @@ export const getNotes = createAsyncThunk(
   "note/getNotes",
   async (_, thunkAPI) => {
     try {
+      //! make a get request
       return await noteService.getNotes();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+//! PostNote async action
+export const postNote = createAsyncThunk(
+  "note/postNote",
+  async (note, thunkAPI) => {
+    try {
+      //! make a post request
+      return await noteService.postNote(note);
     } catch (err) {
       console.log(err);
     }
@@ -42,6 +56,19 @@ const noteSlice = createSlice({
         state.notes = action.payload;
       })
       .addCase(getNotes.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(postNote.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(postNote.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.notes = [...state.notes, action.payload];
+      })
+      .addCase(postNote.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
